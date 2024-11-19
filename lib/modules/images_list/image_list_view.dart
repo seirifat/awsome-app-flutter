@@ -1,9 +1,12 @@
+import 'package:awsomeapp/_rfengine/base_class/bloc_status.dart';
 import 'package:awsomeapp/_rfengine/extensions/theme_extension.dart';
 import 'package:awsomeapp/models/image_model_list.dart';
 import 'package:awsomeapp/modules/images_detail/image_detail_page.dart';
 import 'package:awsomeapp/modules/images_list/cubit/image_list_cubit.dart';
 import 'package:awsomeapp/modules/images_list/widget/grid_view_image.dart';
 import 'package:awsomeapp/modules/images_list/widget/list_view_image.dart';
+import 'package:awsomeapp/widgets/empty_state_widget.dart';
+import 'package:awsomeapp/widgets/shimmer_default_list_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -95,28 +98,52 @@ class MainBody extends StatelessWidget {
           )
         ];
       },
-      body: RefreshIndicator(
-        onRefresh: () async {
-          context.read<ImageListCubit>().refreshPageData();
-        },
-        child: AnimatedSwitcher(
-          duration: const Duration(milliseconds: 300),
-          transitionBuilder: (child, animation) =>
-              FadeTransition(opacity: animation, child: child),
-          child: context.select((ImageListCubit bloc) => bloc.state.isGridMode)
-              ? GridViewImage(
-                  onTapItem: (photo) {
-                    onTapItem(context, photo);
-                  },
-                )
-              : ListViewImage(
-                  onTapItem: (photo) {
-                    onTapItem(context, photo);
-                  },
-                ),
-        ),
-      ),
+      body: _mapStateToWidget(context),
     );
+  }
+
+  Widget _mapStateToWidget(BuildContext context) {
+    final state = context.select((ImageListCubit bloc) => bloc.state);
+    List<Photo> data = state.data?.photos ?? [];
+    switch (state.status) {
+      case BlocStatus.init:
+      case BlocStatus.loading:
+        return const ShimmerDefaultListView(type: ShimmerListType.defaultList);
+      case BlocStatus.error:
+        return EmptyStateWidget(
+          message: state.error ?? "",
+          onRetry: () => context.read<ImageListCubit>().refreshPageData(),
+        );
+      case BlocStatus.success:
+        return RefreshIndicator(
+          onRefresh: () async {
+            context.read<ImageListCubit>().refreshPageData();
+          },
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            transitionBuilder: (child, animation) =>
+                FadeTransition(opacity: animation, child: child),
+            child: data.isEmpty
+                ? EmptyStateWidget(
+                    onRetry: () =>
+                        context.read<ImageListCubit>().refreshPageData(),
+                  )
+                : state.isGridMode
+                    ? GridViewImage(
+                        onTapItem: (photo) {
+                          onTapItem(context, photo);
+                        },
+                      )
+                    : ListViewImage(
+                        onTapItem: (photo) {
+                          onTapItem(context, photo);
+                        },
+                      ),
+          ),
+        );
+      default:
+        return Container();
+    }
   }
 
   void onTapItem(BuildContext context, Photo photo) {

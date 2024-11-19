@@ -1,7 +1,9 @@
 import 'package:awsomeapp/_rfengine/api/images_api.dart';
 import 'package:awsomeapp/_rfengine/base_class/pagination_cubit.dart';
 import 'package:awsomeapp/_rfengine/networking/app_dio.dart';
+import 'package:awsomeapp/_rfengine/networking/dio_error.dart';
 import 'package:awsomeapp/repositories/image_list_repository.dart';
+import 'package:dio/dio.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import '../../../_rfengine/base_class/bloc_status.dart';
@@ -23,7 +25,6 @@ class ImageListCubit extends PaginationCubit<ImageListState, Photo> {
 
   @override
   Future<void> refreshNextPageData() async {
-    // super.refreshNextPageData();
     if (page == 0) {
       emit(state.copyWith(status: BlocStatus.loading));
       await Future.delayed(const Duration(milliseconds: 200));
@@ -48,13 +49,14 @@ class ImageListCubit extends PaginationCubit<ImageListState, Photo> {
             (result.photos?.length ?? 0) < perPage,
       ));
     }).catchError((error) {
-      emit(state.copyWith(status: BlocStatus.error, error: error.toString()));
+      var errorString = DioErrorUtil.getErrorMessage((error as DioException));
+      emit(state.copyWith(status: BlocStatus.error, error: errorString));
     });
   }
 
   Future<void> initData() async {
     emit(state.copyWith(status: BlocStatus.ready));
-    await Future.delayed(const Duration(milliseconds: 200));
+    await Future.delayed(const Duration(milliseconds: 500));
     refreshPageData();
   }
 }
