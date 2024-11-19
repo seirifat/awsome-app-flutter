@@ -15,7 +15,8 @@ class ImageWidget extends StatelessWidget {
       imageUrlString,
       height: 46,
       width: 46,
-      filterQuality: FilterQuality.low,
+      filterQuality: FilterQuality.medium,
+      fit: BoxFit.cover,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) {
           return child;

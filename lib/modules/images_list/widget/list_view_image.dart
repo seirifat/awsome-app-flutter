@@ -8,10 +8,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ListViewImage extends StatelessWidget {
   const ListViewImage({
     super.key,
-    required this.scrollController,
+    this.onTapItem,
   });
 
-  final ScrollController scrollController;
+  final Function(Photo)? onTapItem;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,6 @@ class ListViewImage extends StatelessWidget {
     bool isLastPage =
         context.select((ImageListCubit bloc) => bloc.state.isLastPage);
     return ListView.builder(
-      controller: scrollController,
       itemCount: data.length + (isLastPage ? 0 : 1),
       padding: const EdgeInsets.all(8),
       itemBuilder: (context, index) {
@@ -39,7 +38,9 @@ class ListViewImage extends StatelessWidget {
           ),
           subtitle: Text(item.alt ?? "-"),
           onTap: () {
-            // go detail
+            if (onTapItem != null) {
+              onTapItem!(item);
+            }
           },
         );
       },
