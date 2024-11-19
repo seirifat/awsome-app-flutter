@@ -1,48 +1,45 @@
+import 'package:awsomeapp/models/image_model_list.dart';
+import 'package:awsomeapp/modules/images_list/cubit/image_list_cubit.dart';
+import 'package:awsomeapp/widgets/round_container.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class GridViewImage extends StatelessWidget {
-  const GridViewImage({super.key});
+  const GridViewImage({
+    super.key,
+    this.onTapItem,
+  });
+
+  final Function(Photo)? onTapItem;
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      primary: false,
-      padding: const EdgeInsets.all(20),
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
-      crossAxisCount: 2,
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[100],
-          child: const Text("He'd have you all unravel at the"),
-        ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[200],
-          child: const Text('Heed not the rabble'),
-        ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[300],
-          child: const Text('Sound of screams but the'),
-        ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[400],
-          child: const Text('Who scream'),
-        ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[500],
-          child: const Text('Revolution is coming...'),
-        ),
-        Container(
-          padding: const EdgeInsets.all(8),
-          color: Colors.teal[600],
-          child: const Text('Revolution, they...'),
-        ),
-      ],
+    List<Photo> data =
+        context.select((ImageListCubit bloc) => bloc.state.data?.photos ?? []);
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 8.0,
+        crossAxisSpacing: 8.0,
+      ),
+      padding: const EdgeInsets.all(8.0), // padding around the grid
+      itemCount: data.length, // total number of items
+      itemBuilder: (context, index) {
+        var item = data[index];
+        return InkWell(
+          onTap: () {
+            if (onTapItem != null) {
+              onTapItem!(item);
+            }
+          },
+          child: RoundContainer(
+            child: Image.network(
+              item.src?.medium ?? "",
+              fit: BoxFit.cover,
+            ),
+          ),
+        );
+      },
     );
   }
 }
