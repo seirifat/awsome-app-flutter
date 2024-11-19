@@ -1,4 +1,6 @@
+import 'package:awsomeapp/_rfengine/api/images_api.dart';
 import 'package:awsomeapp/_rfengine/base_class/pagination_cubit.dart';
+import 'package:awsomeapp/_rfengine/networking/app_dio.dart';
 import 'package:awsomeapp/repositories/image_list_repository.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -9,9 +11,11 @@ part 'image_list_state.dart';
 part 'image_list_cubit.freezed.dart';
 
 class ImageListCubit extends PaginationCubit<ImageListState, Photo> {
-  ImageListCubit() : super(const ImageListState());
+  ImageListCubit() : super(const ImageListState()) {
+    repo = ImageListRepository(ImagesApi(AppDio.getDio()));
+  }
 
-  final repo = ImageListRepository();
+  late ImageListRepository repo;
 
   void toggleList() {
     emit(state.copyWith(isGridMode: !state.isGridMode));
