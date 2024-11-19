@@ -1,5 +1,6 @@
 import 'package:awsomeapp/_rfengine/extensions/theme_extension.dart';
 import 'package:awsomeapp/models/image_model_list.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class ImageDetailView extends StatelessWidget {
@@ -19,7 +20,7 @@ class ImageDetailView extends StatelessWidget {
           child: Column(
             children: [
               SizedBox(
-                height: MediaQuery.of(context).size.width,
+                height: kIsWeb ? 450 : MediaQuery.of(context).size.width,
                 child: Center(child: Image.network(photo.src?.large ?? "")),
               ),
               const SizedBox(height: 24),
