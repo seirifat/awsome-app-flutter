@@ -24,7 +24,7 @@ class ImageWidget extends StatelessWidget {
         return Shimmer.fromColors(
           baseColor: Colors.grey.shade300,
           highlightColor: Colors.grey.shade100,
-          child: const Card(child: SizedBox(height: 44)),
+          child: Container(color: Colors.white, width: 46, height: 46),
         );
       },
       errorBuilder: (context, error, stackTrace) => const Icon(
